@@ -34,6 +34,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-duration-seconds: 900
           mask-aws-account-id: false
+          audience: sts.amazonaws.com
           
       - name: Verify AWS Credentials
         run: |
@@ -73,6 +74,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-duration-seconds: 900
           mask-aws-account-id: false
+          audience: sts.amazonaws.com
           
       - name: Verify AWS Credentials
         run: |
@@ -113,6 +115,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-duration-seconds: 900
           mask-aws-account-id: false
+          audience: sts.amazonaws.com
           
       - name: Verify AWS Credentials
         run: |
