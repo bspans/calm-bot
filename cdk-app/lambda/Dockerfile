@@ -1,5 +1,5 @@
 # Use Python 3.9 slim image as base
-FROM python:3.9-slim as builder
+FROM python:3.13-slim as builder
 
 # Install poetry
 RUN pip install poetry
@@ -21,7 +21,7 @@ FROM builder as development
 RUN poetry install --no-interaction --no-ansi
 
 # Production stage
-FROM python:3.9-slim as production
+FROM python:3.13-slim as production
 
 # Set working directory
 WORKDIR /app
