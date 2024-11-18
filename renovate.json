@@ -19,9 +19,6 @@
       "automerge": true
     }
   ],
-  "schedule": [
-    "every weekend"
-  ],
   "timezone": "Europe/Amsterdam",
   "labels": [
     "dependencies"
