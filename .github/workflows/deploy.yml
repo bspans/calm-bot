@@ -1,0 +1,110 @@
+name: Deploy CDK Stack
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Manual trigger
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    environment: development
+    env:
+      AWS_REGION: eu-west-1
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsCDKDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Install Dependencies
+        working-directory: cdk-app
+        run: |
+          npm ci
+          
+      - name: Deploy to Dev
+        working-directory: cdk-app
+        run: |
+          npm run cdk deploy -- --require-approval never
+
+  deploy-test:
+    name: Deploy to Test
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: 
+      name: test
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      AWS_REGION: eu-west-1
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsCDKDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Install Dependencies
+        working-directory: cdk-app
+        run: |
+          npm ci
+          
+      - name: Deploy to Test
+        id: deploy
+        working-directory: cdk-app
+        run: |
+          npm run cdk deploy -- --require-approval never
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: deploy-test
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      AWS_REGION: eu-west-1
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsCDKDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Install Dependencies
+        working-directory: cdk-app
+        run: |
+          npm ci
+          
+      - name: Deploy to Production
+        id: deploy
+        working-directory: cdk-app
+        run: |
+          npm run cdk deploy -- --require-approval never
