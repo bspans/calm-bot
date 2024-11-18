@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  lambda:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - CHAT_SESSIONS_TABLE=ChatSessionsTable
+      - CHAT_MESSAGES_TABLE=ChatMessagesTable
+    command: poetry run pytest tests/ -v
+
+  lambda-prod:
+    build:
+      context: .
+      target: production
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - CHAT_SESSIONS_TABLE=ChatSessionsTable
+      - CHAT_MESSAGES_TABLE=ChatMessagesTable
